@@ -2,17 +2,17 @@
 function north0 { kubectl exec -it north-vault-0 -- vault $@ ;} ; alias n0='north0'
 function north1 { kubectl exec -it north-vault-1 -- vault $@ ;} ; alias n1='north1'
 function north2 { kubectl exec -it north-vault-2 -- vault $@ ;} ; alias n2='north2'
-function north-sh { kubectl exec -it north-vault-2 -- sh ;} ;
+function north-sh { kubectl exec -it north-vault-${1:-0} -- sh ;} ;
 
 function east0 { kubectl exec -it east-vault-0 -- vault $@ ;} ; alias e0='east0'
 function east1 { kubectl exec -it east-vault-1 -- vault $@ ;} ; alias e1='east1'
 function east2 { kubectl exec -it east-vault-2 -- vault $@ ;} ; alias e2='east2'
-function east-sh { kubectl exec -it east-vault-2 -- sh ;} ;
+function east-sh { kubectl exec -it east-vault-${1:-0} -- sh ;} ;
 
 function west0 { kubectl exec -it west-vault-0 -- vault $@ ;} ; alias w0='west0'
 function west1 { kubectl exec -it west-vault-1 -- vault $@ ;} ; alias w1='west1'
 function west2 { kubectl exec -it west-vault-2 -- vault $@ ;} ; alias w2='west2'
-function west-sh { kubectl exec -it west-vault-2 -- sh ;} ;
+function west-sh { kubectl exec -it west-vault-${1:-0} -- sh ;} ;
 
 # Service Endpoint addresses
 VAULT_NORTH=$(kubectl get svc north-vault -o jsonpath="{.spec.clusterIP}")
