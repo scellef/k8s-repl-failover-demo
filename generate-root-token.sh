@@ -14,7 +14,7 @@ cleanup() {
 }
 
 generate_root_token() {
-  # Grab list of keys, init token generation, and return output
+# Grab list of keys, init token generation, and return output
   LIST_OF_KEYS="$(jq -r .recovery_keys_b64[] < ./keys/primary-init.json)"
   OTP=$($VAULT operator generate-root -format=json -init | jq -r .otp) 
   NONCE=$($VAULT operator generate-root -format=json -status | jq -r .nonce) 
@@ -27,6 +27,7 @@ generate_root_token() {
 }
 
 print_root_token() {
+# Print a friendly message with the resultant token
   VAULT=$1
   msg info "Generating token for ${1^} cluster:"
   ROOT_TOKEN=$(generate_root_token)
@@ -34,6 +35,7 @@ print_root_token() {
 }
 
 determine_valid_cluster() {
+# Determine if cluster is a DR secondary or not
   MODE=$($1 read -format=json sys/replication/dr/status 2> /dev/null | jq -r .data.mode 2> /dev/null)
   if [ "$MODE" == "secondary" ] ; then
     msg info "${1^} cluster is a DR secondary, skipping..."
@@ -43,7 +45,7 @@ determine_valid_cluster() {
 }
 
 parse_arguments() {
-  # Parse options and either generate on specified cluster, or all valid clusters
+# Parse options and either generate on specified cluster, or all valid clusters
   if [ -z "$1" ] ; then
     msg aloha "Determining Primary and Performance clusters..."
     for i in north east west ; do
