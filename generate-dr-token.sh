@@ -16,12 +16,12 @@ cleanup() {
 generate_dr_token() {
 # Grab list of keys, init token generation, and return output
   LIST_OF_KEYS="$(jq -r .recovery_keys_b64[] < ./keys/primary-init.json)"
-  OTP=$($VAULT operator generate-root -dr-token -format=json -init | jq -r .otp) 
-  NONCE=$($VAULT operator generate-root -dr-token -format=json -status | jq -r .nonce) 
+  OTP=$($VAULT operator generate-root -dr-token -format=json -init | jq -r .otp)
+  NONCE=$($VAULT operator generate-root -dr-token -format=json -status | jq -r .nonce)
 
   for KEY in $LIST_OF_KEYS ; do
-    ENCODED_TOKEN=$($VAULT operator generate-root -dr-token -nonce=$NONCE -format=json - <<< $KEY | jq -r .encoded_token) 
-  done 
+    ENCODED_TOKEN=$($VAULT operator generate-root -dr-token -nonce=$NONCE -format=json - <<< $KEY | jq -r .encoded_token)
+  done
 
   $VAULT operator generate-root -dr-token -nonce=$NONCE -decode=$ENCODED_TOKEN -otp=$OTP
 }

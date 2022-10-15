@@ -16,12 +16,12 @@ cleanup() {
 generate_root_token() {
 # Grab list of keys, init token generation, and return output
   LIST_OF_KEYS="$(jq -r .recovery_keys_b64[] < ./keys/primary-init.json)"
-  OTP=$($VAULT operator generate-root -format=json -init | jq -r .otp) 
-  NONCE=$($VAULT operator generate-root -format=json -status | jq -r .nonce) 
+  OTP=$($VAULT operator generate-root -format=json -init | jq -r .otp)
+  NONCE=$($VAULT operator generate-root -format=json -status | jq -r .nonce)
 
   for KEY in $LIST_OF_KEYS ; do
-    ENCODED_TOKEN=$($VAULT operator generate-root -nonce=$NONCE -format=json - <<< $KEY | jq -r .encoded_token) 
-  done 
+    ENCODED_TOKEN=$($VAULT operator generate-root -nonce=$NONCE -format=json - <<< $KEY | jq -r .encoded_token)
+  done
 
   $VAULT operator generate-root -nonce=$NONCE -decode=$ENCODED_TOKEN -otp=$OTP
 }
@@ -59,7 +59,7 @@ parse_arguments() {
         determine_valid_cluster $1 ;;
       west)
         determine_valid_cluster $1 ;;
-      *) 
+      *)
         msg error "Invalid cluster: $1.  Specify a cluster from [north east west]" ;;
     esac
   fi
