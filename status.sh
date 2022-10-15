@@ -11,6 +11,7 @@ TABLE_WIDTH="60"                                 # 60 character table width
 ROWS="%-10s| %-10s| %-12s| %-12s| %d\n"
 
 check_cluster_status() {
+# Print cluster statuses from `kubectl`
   msg info "Current statefulsets:
 kubectl get statefulsets.apps -l app.kubernetes.io/name=vault"
   kubectl get statefulsets.apps -l app.kubernetes.io/name=vault
@@ -21,7 +22,7 @@ kubectl get pods -l app.kubernetes.io/name=vault -l vault-active=true"
 }
 
 check_repl_status() {
-  # Parse replication status from each of the clusters, print in a pretty pretty table
+# Parse replication status from each of the clusters, print in a pretty pretty table
   if [ "$1" == "dr" ] ; then
     msg info "${1^^} Replication Status: "
     WAL=".last_dr_wal"

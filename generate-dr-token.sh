@@ -14,7 +14,7 @@ cleanup() {
 }
 
 generate_dr_token() {
-  # Grab list of keys, init token generation, and return output
+# Grab list of keys, init token generation, and return output
   LIST_OF_KEYS="$(jq -r .recovery_keys_b64[] < ./keys/primary-init.json)"
   OTP=$($VAULT operator generate-root -dr-token -format=json -init | jq -r .otp) 
   NONCE=$($VAULT operator generate-root -dr-token -format=json -status | jq -r .nonce) 

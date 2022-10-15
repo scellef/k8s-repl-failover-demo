@@ -23,6 +23,7 @@ msg info "Creating directory '$PROJECT_DIR'"
 mkdir -p $PROJECT_DIR && pushd $PROJECT_DIR > /dev/null
 
 check_license() {
+# Check if a k8s secret `vault-license` exists with key-name `vault.hclic`
   msg info "Confirming Vault license exists..."
   LICENSE_NAME=$(kubectl get secrets vault-license -o jsonpath={.metadata.name} 2> /dev/null)
   if [ -z "$LICENSE_NAME" -o "$LICENSE_NAME" != "vault-license" ] ; then
@@ -33,7 +34,7 @@ check_license() {
 }
 
 setup_unseal_cluster() {
-  # Standup dev server to be used as Transit auto-unseal target
+# Standup dev server to be used as Transit auto-unseal target
   msg info "Deploying Unseal cluster"
   helm install unseal hashicorp/vault \
     --set=server.dev.enabled=true \
@@ -71,7 +72,7 @@ EOF'
 }
 
 setup_cluster() {
-  # Setup 3-node Raft cluster with Transit auto-unseal via Helm chart
+# Setup 3-node Raft cluster with Transit auto-unseal via Helm chart
   msg info "Deploying ${1^} cluster "
   helm install $1 hashicorp/vault \
     --set=server.affinity='' \
@@ -128,8 +129,8 @@ setup_cluster() {
 }
 
 initialize_cluster() {
-  # Initialize cluster with single recovery key, write JSON init output to
-  # $PROJECT_DIR/<CLUSTER_NAME>-init.json
+# Initialize cluster with single recovery key, write JSON init output to
+# $PROJECT_DIR/<CLUSTER_NAME>-init.json
   msg info "Waiting for ${1^} cluster to be ready..."
   sleep 3
   until [ $(sleep 2 ; kubectl get pod ${1}-vault-0 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do 
@@ -148,7 +149,7 @@ initialize_cluster() {
 }
 
 enable_replication() {
-  # Configure replication type ($1) and role ($2) on the named cluster ($3)
+# Configure replication type ($1) and role ($2) on the named cluster ($3)
   if [ "$1" == "dr" ] ; then
     msg info "Enabling ${1^^} ${2^} replication on ${3^} cluster"
   else 
@@ -182,7 +183,7 @@ enable_replication() {
 }
 
 final_confirmation() {
-  # Wait until all clusters and their members are up before declaring success
+# Wait until all clusters and their members are up before declaring success
   msg info "Confirming cluster readiness..."
   until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="north-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do 
     sleep 1
