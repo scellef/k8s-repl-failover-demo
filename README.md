@@ -71,6 +71,10 @@ Prints the cluster and replication status (in a pretty pretty table).
 
 Iterates over clusters and generates a DR token on any DR secondary clusters found.
 
+`./generate-dr-token.sh [north east west]`
+
+Iterates over clusters and generates a root token on any non-DR secondary clusters found, or attempt to create a root token on optionally specified cluster.
+
 `./cleanup.sh`
 
 Attempts to sanely teardown this demo environment by uninstalling the Helm charts, removing persistent volumes the Helm chart leaves behind, and unsetting shell functions or aliases.
@@ -78,7 +82,7 @@ Attempts to sanely teardown this demo environment by uninstalling the Helm chart
 ## TODO
 
 * ~`generate-dr-token.sh`~
-* `generate-root-token.sh`
+* ~`generate-root-token.sh`~
 * `failover.sh`
 * `split-head.sh`
 * ~`status.sh`~
