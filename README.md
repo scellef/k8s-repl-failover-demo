@@ -63,6 +63,10 @@ with the clusters and pods:
 
 Replace `north` with `east` or `west` to interact with those specific clusters.
 
+`./status.sh`
+
+Prints the cluster and replication status (in a pretty pretty table).
+
 `./cleanup.sh`
 
 Attempts to sanely teardown this demo environment by uninstalling the Helm charts, removing persistent volumes the Helm chart leaves behind, and unsetting shell functions or aliases.
