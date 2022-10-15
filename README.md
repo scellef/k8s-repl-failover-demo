@@ -81,8 +81,23 @@ Attempts to sanely teardown this demo environment by uninstalling the Helm chart
 
 ## TODO
 
-* ~`generate-dr-token.sh`~
-* ~`generate-root-token.sh`~
+* Parameterize Vault image version
+* Create each cluster in its own namespace
 * `failover.sh`
+  * Ensure helper text explicitly describes scenario, following SOP
 * `split-head.sh`
-* ~`status.sh`~
+  * Ensure helper text explicitly describes scenario, following SOP and describes What Went Wrong™
+* Add optional parameter to `setup.sh` to specify `primary_cluster_addr` options aimed at service endpoints
+* Enable TLS by default issued from PKI engine on Unseal cluster
+* Add `south` cluster to initially act as PR secondary's DR secondary
+* Enable k8s auth
+  * chaosmonkey mitm TLS?
+* Introduce the Agent Injector into this madness
+* Add chaosmonkey script to arbitrarily block pod ports
+* Something something Rancher?
+* Something something OpenShift?
+* Allow for Consul/Other(Postgres) storage backend?
+* Create/borrow synethtic load script (primarily thinking of Brian Shumate's exceptional [Blazing Sword](https://github.com/brianshumate/vaultron/blob/main/blazing_sword))
+* Implement/add Vault/Helm TF providers in place of my One True Love Bash <3
+* Maybe one day make robust enough to deploy Vaults across multiple k8s clusters?
+  * chaosmonkey mitm k8s auth injector?
