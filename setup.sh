@@ -33,6 +33,23 @@ check_license() {
   fi
 }
 
+set_vault_version() {
+# Parse env vars for image version
+  if [ -n "$VAULT_IMAGE" ] ; then
+    msg info "\$VAULT_IMAGE set: \"$VAULT_IMAGE\""
+  else
+    VAULT_IMAGE="hashicorp/vault-enterprise"
+  fi
+
+  if [ -n "$VAULT_VERSION_TAG" ] ; then
+    msg info "\$VAULT_VERSION_TAG set: \"$VAULT_VERSION_TAG\""
+  else
+    VAULT_VERSION_TAG="latest"
+  fi
+
+  msg info "Using image \"${VAULT_IMAGE}:${VAULT_VERSION_TAG}\""
+}
+
 setup_unseal_cluster() {
 # Standup dev server to be used as Transit auto-unseal target
   msg info "Deploying Unseal cluster"
@@ -41,7 +58,7 @@ setup_unseal_cluster() {
     --set=server.dev.devRootToken=root \
     --set=server.standalone.enabled=true \
     --set=server.image.repository=hashicorp/vault-enterprise \
-    --set=server.image.tag=1.11.3-ent \
+    --set=server.image.tag=$VAULT_VERSION_TAG \
     --set=server.enterpriseLicense.secretName=vault-license \
     --set=server.enterpriseLicense.secretKey=vault.hclic \
     --set=server.extraArgs="-dev-ha -dev-transactional" \
@@ -80,7 +97,7 @@ setup_cluster() {
     --set=server.ha.raft.enabled=true \
     --set=server.ha.raft.replicas=3 \
     --set=server.image.repository=hashicorp/vault-enterprise \
-    --set=server.image.tag=1.11.3-ent \
+    --set=server.image.tag=$VAULT_VERSION_TAG \
     --set=server.enterpriseLicense.secretName=vault-license \
     --set=server.enterpriseLicense.secretKey=vault.hclic \
     --set=server.logLevel=trace \
@@ -200,6 +217,7 @@ final_confirmation() {
 ## Main workflow
 check_deps
 check_license
+set_vault_version
 
 setup_unseal_cluster
 setup_cluster north
