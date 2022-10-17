@@ -61,7 +61,49 @@ with the clusters and pods:
 * `north-sh [0-2]` -- Starts an interactive `sh` session inside of `north-vault-0` (default) or the pod index specified in the first argument
 * `north[0-2]` -- Submits `vault` CLI sub-commands to the `north-vault-n` pod via `kubectl exec`, where `n` is the pod index between `0` and `2` (aliased to `n[0-2]`)
 
-Replace `north` with `east` or `west` to interact with those specific clusters.
+Replace `north` with `east` or `west` to interact with those specific clusters.  For example, to check the `vault status` on the active node in the North cluster:
+
+```
+$ north-active status
+Key                      Value
+---                      -----
+Recovery Seal Type       shamir
+Initialized              true
+Sealed                   false
+Total Recovery Shares    1
+Threshold                1
+Version                  1.12.0+ent
+Build Date               2022-10-10T19:00:46Z
+Storage Type             raft
+Cluster Name             vault-cluster-7c1a39ff
+Cluster ID               ff6d75e2-f626-40e7-6b80-f5cbd813401c
+HA Enabled               true
+HA Cluster               https://north-vault-0.north-vault-internal:8201
+HA Mode                  active
+Active Since             2022-10-17T23:46:47.442173754Z
+Raft Committed Index     364
+Raft Applied Index       364
+Last WAL                 62
+```
+
+To see the Vault binary version in the `east-vault-0` pod:
+
+```
+$ e0 version
+Vault v1.12.0+ent (2b95ea0ba6fe708949201df0f84bc30b5b1bf74a), built 2022-10-10T19:00:46Z
+```
+
+To see check the Raft peers in West cluster:
+
+```
+$ west-active operator raft list-peers -dr-token=hvs.8DEK1exgxIuT9HBWGTwIY9kG
+Node                                    Address                                  State       Voter
+----                                    -------                                  -----       -----
+542aff89-0d79-8918-331b-3d2f497cde19    west-vault-0.west-vault-internal:8201    leader      true
+d7eba1b3-343b-83c7-d9ca-e2bf46e6acc3    west-vault-2.west-vault-internal:8201    follower    true
+35f69c69-51f7-8fbd-2190-aaa85fb0cf8b    west-vault-1.west-vault-internal:8201    follower    true
+```
+
 
 `./status.sh`
 
@@ -85,8 +127,8 @@ Attempts to sanely teardown this demo environment by uninstalling the Helm chart
 
 ## TODO
 
-* Add Examples section
-* Parameterize Vault image version
+* ~Add Examples section~
+* ~Parameterize Vault image version~
 * Create each cluster in its own namespace
 * `failover.sh`
   * Ensure helper text explicitly describes scenario, following SOP
