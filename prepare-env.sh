@@ -28,17 +28,22 @@ VAULT_WEST_ACTIVE=$(kubectl get svc west-vault-active -o jsonpath="{.spec.cluste
 VAULT_WEST_STANDBY=$(kubectl get svc west-vault-standby -o jsonpath="{.spec.clusterIP}")
 
 # Service Endpoint specific functions
-function north { VAULT_ADDR=http://$VAULT_NORTH:8200 vault $@ ;} ;
-function north-active { VAULT_ADDR=http://$VAULT_NORTH_ACTIVE:8200 vault $@ ;} ; alias na='north-active'
-function north-standby { VAULT_ADDR=http://$VAULT_NORTH_STANDBY:8200 vault $@ ;} ; alias ns='north-standby'
+function north { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_NORTH:8200 vault $@ ;} ;
+function north-active { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_NORTH_ACTIVE:8200 vault $@ ;} ; alias na='north-active'
+function north-standby { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_NORTH_STANDBY:8200 vault $@ ;} ; alias ns='north-standby'
 
-function east { VAULT_ADDR=http://$VAULT_EAST:8200 vault $@ ;} ;
-function east-active { VAULT_ADDR=http://$VAULT_EAST_ACTIVE:8200 vault $@ ;} ; alias ea='east-active'
-function east-standby { VAULT_ADDR=http://$VAULT_EAST_STANDBY:8200 vault $@ ;} ; alias es='east-standby'
+function east { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_EAST:8200 vault $@ ;} ;
+function east-active { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_EAST_ACTIVE:8200 vault $@ ;} ; alias ea='east-active'
+function east-standby { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_EAST_STANDBY:8200 vault $@ ;} ; alias es='east-standby'
 
-function west { VAULT_ADDR=http://$VAULT_WEST:8200 vault $@ ;} ;
-function west-active { VAULT_ADDR=http://$VAULT_WEST_ACTIVE:8200 vault $@ ;} ; alias wa='west-active'
-function west-standby { VAULT_ADDR=http://$VAULT_WEST_STANDBY:8200 vault $@ ;} ; alias ws='west-standby'
+function west { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_WEST:8200 vault $@ ;} ;
+function west-active { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_WEST_ACTIVE:8200 vault $@ ;} ; alias wa='west-active'
+function west-standby { VAULT_TOKEN=$(set_token) VAULT_ADDR=http://$VAULT_WEST_STANDBY:8200 vault $@ ;} ; alias ws='west-standby'
+
+function set_token {
+  [ -f ./keys/${FUNCNAME[1]%%-*}-init.json ] \
+    && jq -r .root_token < ./keys/${FUNCNAME[1]%%-*}-init.json 2> /dev/null
+}
 
 # Ensuring shell completion for the above aliases and functions
 complete -C /usr/bin/vault north ;
