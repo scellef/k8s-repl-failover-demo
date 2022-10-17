@@ -93,7 +93,7 @@ $ e0 version
 Vault v1.12.0+ent (2b95ea0ba6fe708949201df0f84bc30b5b1bf74a), built 2022-10-10T19:00:46Z
 ```
 
-To see check the Raft peers in West cluster:
+To see the list of Raft peers in the West cluster:
 
 ```
 $ west-active operator raft list-peers -dr-token=hvs.8DEK1exgxIuT9HBWGTwIY9kG
