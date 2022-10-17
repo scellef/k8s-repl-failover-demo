@@ -75,12 +75,17 @@ Iterates over clusters and generates a DR token on any DR secondary clusters fou
 
 Iterates over clusters and generates a root token on any non-DR secondary clusters found, or attempt to create a root token on optionally specified cluster.
 
+`./login.sh`
+
+Iterates over cluster and attempts a `vault login` to write a `~/.vault-token` inside each container.  Will automatically generate a new root token on Performance Secondary clusters and skip DR Secondary clusters.
+
 `./cleanup.sh`
 
 Attempts to sanely teardown this demo environment by uninstalling the Helm charts, removing persistent volumes the Helm chart leaves behind, and unsetting shell functions or aliases.
 
 ## TODO
 
+* Add Examples section
 * Parameterize Vault image version
 * Create each cluster in its own namespace
 * `failover.sh`
