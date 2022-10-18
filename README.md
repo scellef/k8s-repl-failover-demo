@@ -31,7 +31,7 @@ This project is for demonstration/learning purposes only.  These scripts are fra
 ## Dependencies
 
 * `bash` v4.0 or newer
-  * If you're using MacOS, you install a newer version of `bash` from Homebrew with the following:
+  * If you're using MacOS, you can install a newer version of `bash` from Homebrew:
 
     ```
     $ brew install bash
