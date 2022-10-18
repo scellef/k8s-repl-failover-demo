@@ -228,10 +228,10 @@ initialize_cluster north
 initialize_cluster east
 initialize_cluster west
 
-enable_replication dr primary north
-enable_replication dr secondary west
 enable_replication performance primary north
 enable_replication performance secondary east
+enable_replication dr primary north
+enable_replication dr secondary west
 
 final_confirmation
 msg success "Setup complete!"
