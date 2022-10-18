@@ -30,6 +30,13 @@ This project is for demonstration/learning purposes only.  These scripts are fra
 
 ## Dependencies
 
+* `bash` v4.0 or newer
+  * If you're using MacOS, you install a newer version of `bash` from Homebrew with the following:
+
+    ```
+    $ brew install bash
+    ```
+
 * `jq`
 * `kubectl` configured to connect to a Kubernetes cluster
 * `helm` configured with [HashiCorp's official repo](https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#how-to)
