@@ -39,9 +39,7 @@ This project is for demonstration/learning purposes only.  These scripts are fra
 
 `./setup.sh`
 
-This file initializes the deployments and configures the replication
-relationships.  It will check for dependencies and a HashiCorp Vault Enterprise
-license before performing the following:
+This file initializes the deployments and configures the replication relationships.  It will check for dependencies a HashiCorp Vault Enterprise license before performing the following:
 
 1. Deploy unseal cluster
 1. Configure Transform secrets engine for Transit Auto-Unseal
@@ -50,10 +48,14 @@ license before performing the following:
 1. Enable DR secondary on west cluster
 1. Enable Perf secondary on east cluster
 
+Note that you can specify either the container image or version by setting the following environment variables:
+
+* `VAULT_IMAGE` -- Defaults to `hashicorp/vault-enterprise`
+* `VAULT_VERSION_TAG` -- Defaults to `latest`.  _Note: Make sure to select a valid tag from [HashiCorp's Docker Hub repository](https://hub.docker.com/r/hashicorp/vault-enterprise/tags); some earlier versions use underscores (`_`) rather than hyphens (`-`)_
+
 `. ./prepare-env.sh`
 
-This file provides a series of bash functions and aliases to interact directly
-with the clusters and pods:
+This file provides a series of bash functions and aliases to interact directly with the clusters and pods:
 
 * `north` -- Submits `vault` CLI sub-commands to the `north-vault` service endpoint
 * `north-active` -- Submits `vault` CLI sub-commands to the `north-vault-active` service endpoint (aliased to `na`)
