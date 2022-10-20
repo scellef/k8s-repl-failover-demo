@@ -17,7 +17,7 @@ msg aloha "
                       West ∇     ∇ East
                       DR 2nd     Perf 2nd"
 
-# Move into temporary project directory 
+# Move into temporary project directory
 PROJECT_DIR='./keys'
 msg info "Creating directory '$PROJECT_DIR'"
 mkdir -p $PROJECT_DIR && pushd $PROJECT_DIR > /dev/null
@@ -29,7 +29,7 @@ check_license() {
   if [ -z "$LICENSE_NAME" -o "$LICENSE_NAME" != "vault-license" ] ; then
     msg warn "Vault license not found in secrets.  Please paste your license (or Ctrl-C to exit): "
     read LICENSE
-    kubectl create secret generic vault-license --from-literal=vault.hclic=$LICENSE 
+    kubectl create secret generic vault-license --from-literal=vault.hclic=$LICENSE
   fi
 }
 
@@ -63,15 +63,15 @@ setup_unseal_cluster() {
     --set=server.enterpriseLicense.secretKey=vault.hclic \
     --set=server.extraArgs="-dev-ha -dev-transactional" \
     --set=injector.enabled=false \
-    --set=global.tlsDisable=true > /dev/null 
+    --set=global.tlsDisable=true > /dev/null
 
   msg info "Waiting until Unseal cluster pod is ready..."
-  until [ $(sleep 1 ; kubectl get pod unseal-vault-0 -o json | jq .status.containerStatuses[].ready) == "true" ] 2> /dev/null ; do 
+  until [ $(sleep 1 ; kubectl get pod unseal-vault-0 -o json | jq .status.containerStatuses[].ready) == "true" ] 2> /dev/null ; do
     sleep 2
   done
 
   msg info "Preparing Transit auto-unseal"
-  kubectl exec -it unseal-vault-0 -- vault login -no-print root 
+  kubectl exec -it unseal-vault-0 -- vault login -no-print root
   kubectl exec -it unseal-vault-0 -- vault secrets enable transit
   kubectl exec -it unseal-vault-0 -- vault write -f transit/keys/autounseal
   kubectl exec -it unseal-vault-0 -- sh -c 'vault policy write autounseal - << EOF
@@ -150,13 +150,13 @@ initialize_cluster() {
 # $PROJECT_DIR/<CLUSTER_NAME>-init.json
   msg info "Waiting for ${1^} cluster to be ready..."
   sleep 3
-  until [ $(sleep 2 ; kubectl get pod ${1}-vault-0 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do 
+  until [ $(sleep 2 ; kubectl get pod ${1}-vault-0 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do
     sleep 1
   done
-  until [ $(sleep 2 ; kubectl get pod ${1}-vault-1 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do 
+  until [ $(sleep 2 ; kubectl get pod ${1}-vault-1 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do
     sleep 1
   done
-  until [ $(sleep 2 ; kubectl get pod ${1}-vault-2 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do 
+  until [ $(sleep 2 ; kubectl get pod ${1}-vault-2 -o json | jq .status.containerStatuses[].started) == "true" ] 2> /dev/null ; do
     sleep 1
   done
 
@@ -169,7 +169,7 @@ enable_replication() {
 # Configure replication type ($1) and role ($2) on the named cluster ($3)
   if [ "$1" == "dr" ] ; then
     msg info "Enabling ${1^^} ${2^} replication on ${3^} cluster"
-  else 
+  else
     msg info "Enabling ${1^} ${2^} replication on ${3^} cluster"
   fi
 
@@ -202,13 +202,13 @@ enable_replication() {
 final_confirmation() {
 # Wait until all clusters and their members are up before declaring success
   msg info "Confirming cluster readiness..."
-  until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="north-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do 
+  until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="north-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do
     sleep 1
   done
-  until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="west-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do 
+  until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="west-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do
     sleep 1
   done
-  until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="east-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do 
+  until [ "$(kubectl get statefulsets.apps -o json | jq '.items[] | select(.metadata.name=="east-vault") | .status.readyReplicas')" == "3" ] 2> /dev/null ; do
     sleep 1
   done
 }
@@ -235,7 +235,8 @@ enable_replication dr secondary west
 
 final_confirmation
 msg success "Setup complete!"
-msg aloha "To interact with the clusters, source the 'prepare-env.sh' file: "
+msg aloha "If you deployed to minikube, source the 'prepare-env.sh' file to "
+msg aloha "interact with the clusters: "
 msg aloha
 msg aloha "    . ./prepare-env.sh"
 msg aloha
@@ -244,8 +245,9 @@ msg aloha "minikube, run the following in a separate terminal: "
 msg aloha
 msg aloha "    minikube tunnel"
 msg aloha
-msg aloha "Alternatively, create a proxy via kubetl: "
+msg aloha "Alternatively, create a port-forward to your desired pod via kubetl: "
 msg aloha
-msg aloha "    kubectl proxy" 
+msg aloha "    kubectl port-forward north-vault-0 18200:8200 "
+msg aloha "    export VAULT_ADDR=http://localhost:18200"
 msg aloha
 msg aloha "Happy replicating!"
