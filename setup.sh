@@ -57,7 +57,7 @@ setup_unseal_cluster() {
     --set=server.dev.enabled=true \
     --set=server.dev.devRootToken=root \
     --set=server.standalone.enabled=true \
-    --set=server.image.repository=hashicorp/vault-enterprise \
+    --set=server.image.repository=$VAULT_IMAGE \
     --set=server.image.tag=$VAULT_VERSION_TAG \
     --set=server.enterpriseLicense.secretName=vault-license \
     --set=server.enterpriseLicense.secretKey=vault.hclic \
@@ -96,7 +96,7 @@ setup_cluster() {
     --set=server.ha.enabled=true \
     --set=server.ha.raft.enabled=true \
     --set=server.ha.raft.replicas=3 \
-    --set=server.image.repository=hashicorp/vault-enterprise \
+    --set=server.image.repository=$VAULT_IMAGE \
     --set=server.image.tag=$VAULT_VERSION_TAG \
     --set=server.enterpriseLicense.secretName=vault-license \
     --set=server.enterpriseLicense.secretKey=vault.hclic \
