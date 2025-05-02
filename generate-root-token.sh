@@ -8,7 +8,7 @@ trap cleanup SIGINT
 
 cleanup() {
 # Cancel any unfinished attempts if Ctrl-C is hit
- if [ $($VAULT operator generate-root -status -format=json | jq .started) == 'true' ] ; then
+ if [ $($VAULT operator generate-root $DR_FLAG -status -format=json | jq .started) == 'true' ] ; then
    $VAULT operator generate-root -cancel
  fi
 }
@@ -16,29 +16,36 @@ cleanup() {
 generate_root_token() {
 # Grab list of keys, init token generation, and return output
   LIST_OF_KEYS="$(jq -r .recovery_keys_b64[] < ./keys/primary-init.json)"
-  OTP=$($VAULT operator generate-root -format=json -init | jq -r .otp)
-  NONCE=$($VAULT operator generate-root -format=json -status | jq -r .nonce)
+  OTP=$($VAULT operator generate-root $DR_FLAG -format=json -init | jq -r .otp)
+  NONCE=$($VAULT operator generate-root $DR_FLAG -format=json -status | jq -r .nonce)
 
   for KEY in $LIST_OF_KEYS ; do
-    ENCODED_TOKEN=$($VAULT operator generate-root -nonce=$NONCE -format=json - <<< $KEY | jq -r .encoded_token)
+    ENCODED_TOKEN=$($VAULT operator generate-root $DR_FLAG -nonce=$NONCE -format=json - <<< $KEY | jq -r .encoded_token)
   done
 
-  $VAULT operator generate-root -nonce=$NONCE -decode=$ENCODED_TOKEN -otp=$OTP
+  $VAULT operator generate-root $DR_FLAG -nonce=$NONCE -decode=$ENCODED_TOKEN -otp=$OTP
 }
 
 print_root_token() {
 # Print a friendly message with the resultant token
   VAULT=$1
   msg info "Generating token for ${1^} cluster:"
-  ROOT_TOKEN=$(generate_root_token)
-  msg success "${1^} Root Token: $ROOT_TOKEN"
+  if [ "$MODE" == "secondary" ] ; then
+    DR_TOKEN=$(generate_root_token)
+    msg success "${1^} DR Operation Token: $DR_TOKEN"
+  else
+    ROOT_TOKEN=$(generate_root_token)
+    msg success "${1^} Root Token: $ROOT_TOKEN"
+  fi
 }
 
 determine_valid_cluster() {
 # Determine if cluster is a DR secondary or not
-  MODE=$($1 read -format=json sys/replication/dr/status 2> /dev/null | jq -r .data.mode 2> /dev/null)
+  export MODE=$($1 read -format=json sys/replication/dr/status 2> /dev/null | jq -r .data.mode 2> /dev/null)
   if [ "$MODE" == "secondary" ] ; then
-    msg info "${1^} cluster is a DR secondary, skipping..."
+    export DR_FLAG="-dr-token"
+    #msg info "${1^} cluster is a DR secondary, skipping..."
+    print_root_token $1
   else
     print_root_token $1
   fi
@@ -68,4 +75,5 @@ parse_arguments() {
 parse_arguments $1
 
 # Cleanup any unfinished attempts if we make it this far
-[ -n "$VAULT" -a "$MODE" == "secondary" ] && $VAULT operator generate-root -cancel 1>&2 > /dev/null
+#[ -n "$VAULT" -a "$MODE" == "secondary" ] && $VAULT operator generate-root $DR_FLAG -cancel 1>&2 > /dev/null
+[ -n "$VAULT" ] && $VAULT operator generate-root $DR_FLAG -cancel 1>&2 > /dev/null
