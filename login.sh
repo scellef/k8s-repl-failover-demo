@@ -10,7 +10,7 @@ for i in north east west ; do
   if [ $($i read -format=json sys/replication/dr/status 2> /dev/null | jq -r .data.mode 2> /dev/null) == "secondary" ] ; then
     msg info "${i^} cluster is DR secondary.  Generating new DR operation token..."
     SECONDARY_TOKEN=$(./generate-root-token.sh $i | grep '\+' | awk '{print $(NF-1)}')
-    jq -r '. | .root_token |= .+ {"dr_token": "'$SECONDARY_TOKEN'"}' < keys/${i}-init.json > keys/$i-init.json
+    jq -r '. |= .+ {"dr_token": "'$SECONDARY_TOKEN'"}' < keys/primary-init.json > keys/$i-init.json
     for j in {0..2} ; do
       msg info "Writing token to ${i}-vault-${j}:/home/vault/.vault-token..."
       kubectl exec -it ${i}-vault-$j -- sh -c "echo $SECONDARY_TOKEN > /home/vault/.vault-token"
