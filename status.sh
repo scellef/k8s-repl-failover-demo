@@ -7,8 +7,8 @@
 # Variables for drawing printf table
 SEPARATOR="--------------------"                 # 20 '-' characters
 SEPARATOR="${SEPARATOR}${SEPARATOR}${SEPARATOR}" # 3*20 '-' characters
-TABLE_WIDTH="60"                                 # 60 character table width
-ROWS="%-10s| %-10s| %-12s| %-12s| %d\n"
+TABLE_WIDTH="61"                                 # 60 character table width
+ROWS="%-10s| %-10s| %-12s| %-13s| %d\n"
 
 check_cluster_status() {
 # Print cluster statuses from `kubectl`
@@ -30,16 +30,16 @@ check_repl_status() {
     msg info "${1^} Replication Status: "
     WAL=".last_performance_wal"
   fi
-  printf "%-10s| %-10s| %-12s| %-12s| %-11s\n" Cluster Mode State Status Last_WAL
+  printf "%-10s| %-10s| %-12s| %-13s| %-11s\n" Cluster Mode State Status Last_WAL
   printf "%.${TABLE_WIDTH}s\n" $SEPARATOR
   for i in north east west ; do 
-    MODE=$($i read -format=json sys/replication/${1}/status 2> /dev/null | jq -r .data.mode 2> /dev/null)
+    MODE=$(VAULT_CLIENT_TIMEOUT=1s $i read -format=json sys/replication/${1}/status 2> /dev/null | jq -r .data.mode 2> /dev/null)
     if [ "$MODE" == "primary" ] ; then
-      printf "$ROWS" "${i^}" $($i read -format=json sys/replication/${1}/status 2> /dev/null | 
-        jq ".data | [.mode, .state, .secondaries[].connection_status, $WAL] | .[]" -r) 2> /dev/null
+      printf "$ROWS" "${i^}" $(VAULT_CLIENT_TIMEOUT=1s $i read -format=json sys/replication/${1}/status 2> /dev/null |
+        jq '.data | [.mode, .state, .secondaries[].connection_status // "disconnected", '$WAL'] | .[]' -r) 2> /dev/null
     elif [ "$MODE" == "secondary" ] ; then
-      printf "$ROWS" "${i^}" $($i read -format=json sys/replication/${1}/status 2> /dev/null | 
-        jq '.data | [.mode, .state, .primaries[].connection_status, .last_remote_wal] | .[]' -r) 2> /dev/null
+      printf "$ROWS" "${i^}" $(VAULT_CLIENT_TIMEOUT=1s $i read -format=json sys/replication/${1}/status 2> /dev/null |
+        jq '.data | [.mode, .state, .primaries[].connection_status // "disconnected", .last_remote_wal] | .[]' -r) 2> /dev/null
     else 
       printf "$ROWS" "${i^}" "disabled"
     fi
